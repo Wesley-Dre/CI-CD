@@ -16,4 +16,3 @@ public class Inquilino {
         System.out.println("---------------------------");
     }
 }
-22
