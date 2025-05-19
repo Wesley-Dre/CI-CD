@@ -1,9 +1,17 @@
 name: Verificar Compilação Java
 
+# Gatilhos para execução do workflow
 on:
+  # Quando for feito um push para a branch 'main'
+  push:
+    branches:
+      - main
+  # Quando um pull request for criado ou atualizado com destino para 'main'
   pull_request:
     branches:
       - main
+  # Permite execução manual pelo GitHub (botão "Run workflow")
+  workflow_dispatch:
 
 jobs:
   verificar:
@@ -11,12 +19,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Faz o checkout do código-fonte do repositório
       - name: Checkout do código
         uses: actions/checkout@v3
 
+      # Lista os arquivos do repositório (útil para debug)
       - name: Listar arquivos
         run: ls -R
 
+      # Compila os arquivos Java que estão dentro de 'src/'
       - name: Compilar código Java
         run: |
           mkdir -p out
@@ -26,5 +37,7 @@ jobs:
             exit 1
           }
 
+      # Se tudo der certo, exibe mensagem de sucesso
       - name: ✅ Sucesso
-        run: echo "Código compilou com sucesso!"
+        if: success()
+        run: echo "✅ Código compilou com sucesso!"
