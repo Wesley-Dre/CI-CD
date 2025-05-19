@@ -1,9 +1,6 @@
-name: CI/CD Pipeline
+name: Verificar Compilação Java
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -16,20 +13,17 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Listar arquivos do projeto
+      - name: Listar arquivos
         run: ls -R
 
       - name: Compilar código Java
         run: |
           mkdir -p out
-          # Compilar todas as classes Java na pasta src
-          javac -d out $(find src -name "*.java")
-          
-          # Se a compilação falhar, o processo será interrompido
-          if [ $? -ne 0 ]; then
-            echo "::error::Falha na compilação!"
+          echo "Compilando arquivos..."
+          javac -d out $(find src -name "*.java") || {
+            echo "::error::Erro na compilação!"
             exit 1
-          fi
-          
-          echo "✅ Código compilado com sucesso!"
+          }
 
+      - name: ✅ Sucesso
+        run: echo "Código compilou com sucesso!"
