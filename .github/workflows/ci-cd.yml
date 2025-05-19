@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@v2
 
       # Passo 2: Configurar o ambiente para rodar os testes
-      - name: Configurar Java (usando a distribuição adotopenjdk)
+      - name: Configurar Java (usando a distribuição temurin)
         uses: actions/setup-java@v2
         with:
           java-version: '11'             # Versão do JDK
-          distribution: 'adoptopenjdk'   # Distribuição do JDK
+          distribution: 'temurin'        # Distribuição do JDK (temurin é a nova distribuição)
           architecture: 'x64'            # Arquitetura da máquina
           
       # Passo 3: Rodar os testes de integração (exemplo para Java)
