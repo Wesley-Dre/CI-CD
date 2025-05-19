@@ -1,28 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// Classe que representa um inquilino
-class Inquilino {
-    String nome;
-    String apartamento;
-    String telefone;
-
-    public Inquilino(String nome, String apartamento, String telefone) {
-        this.nome = nome;
-        this.apartamento = apartamento;
-        this.telefone = telefone;
-    }
-
-    public void exibirDados() {
-        System.out.println("Nome: " + nome);
-        System.out.println("Apartamento: " + apartamento);
-        System.out.println("Telefone: " + telefone);
-        System.out.println("---------------------------");
-    }
-}
-
-// Classe principal pública (deve estar em um arquivo com o mesmo nome)
-public class CadastroInquilinos {
+public class Ci {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Inquilino> listaInquilinos = new ArrayList<>();
@@ -56,4 +35,3 @@ public class CadastroInquilinos {
         scanner.close();
     }
 }
-
