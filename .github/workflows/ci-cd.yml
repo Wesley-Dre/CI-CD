@@ -43,4 +43,4 @@ jobs:
       # Passo 4: Fazer o deploy no servidor local via SSH
       - name: Deploy no servidor local
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD_
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
