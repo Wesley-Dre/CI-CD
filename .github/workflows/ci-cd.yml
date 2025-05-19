@@ -9,24 +9,45 @@ on:
       - main  # Para pull requests na branch main
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest  # Roda no Ubuntu
 
     steps:
       # Passo 1: Baixar o código do repositório
-      - name: Checkout do código
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      # Passo 2: Verificar se o código Java compila (sem usar gradle ou maven)
-      - name: Verificar se o código Java compila
+      # Passo 2: Rodar os testes de integração ou verificação do código
+      - name: Rodar testes
         run: |
-          # Compilar todos os arquivos Java em 'src'
-          javac src/*.java
-          
-          # Verificar se a compilação foi bem-sucedida
+          # Rodar a verificação de sintaxe (compilar e executar, ou customizar para seu caso)
+          javac -d out src/*.java   # Compila o código Java
+          java -cp out TestClass    # Roda os testes em TestClass (substitua pelo nome da sua classe de testes)
+
+      # Verificação se os testes falharam
+      - name: Verificar se os testes passaram
+        run: |
           if [ $? -ne 0 ]; then
-            echo "❌ Erros de compilação encontrados. Não é permitido fazer push!"
-            exit 1
+            echo "❌ Testes falharam. Não é permitido fazer push!" 
+            exit 1  # Não permite o push, falha no workflow
           else
-            echo "✅ O código compila corretamente!"
+            echo "✅ Testes passaram! Pode prosseguir com o commit."
           fi
+          
+  # O deploy não será executado se o job de teste falhar
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest  # Roda no Ubuntu também
+
+    steps:
+      - name: Adicionar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
+
+      # Passo 4: Fazer o deploy no servidor local via SSH
+      - name: Deploy no servidor local
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
