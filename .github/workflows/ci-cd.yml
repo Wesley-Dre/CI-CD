@@ -19,10 +19,14 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'             # Versão do JDK
-          distribution: 'temurin'        # Distribuição do JDK (temurin é a nova distribuição)
+          distribution: 'temurin'        # Distribuição do JDK
           architecture: 'x64'            # Arquitetura da máquina
-          
-      # Passo 3: Rodar os testes de integração (exemplo para Java)
+
+      # Passo 3: Garantir permissões de execução para gradlew
+      - name: Garantir permissões de execução para gradlew
+        run: chmod +x ./gradlew
+
+      # Passo 4: Rodar os testes de integração
       - name: Rodar testes de integração
         run: |
           ./gradlew test  # Ou qualquer comando para rodar seus testes, como mvn test ou ./run_tests.sh
@@ -40,7 +44,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
 
-      # Passo 4: Fazer o deploy no servidor local via SSH
+      # Passo 5: Fazer o deploy no servidor local via SSH
       - name: Deploy no servidor local
         run: |
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
