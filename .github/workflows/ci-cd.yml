@@ -9,7 +9,7 @@ on:
       - main  # Para pull requests na branch main
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest  # Roda no Ubuntu
 
     steps:
@@ -17,39 +17,16 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v2
 
-      # Passo 2: Configurar Java
-      - name: Configurar Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'  # Defina a versão do Java que está usando
-          distribution: 'adoptopenjdk'  # Pode usar OpenJDK ou outras distribuições
-
-      # Passo 3: Compilar e rodar os testes
-      - name: Compilar código e rodar testes
+      # Passo 2: Verificar se o código Java compila (sem usar gradle ou maven)
+      - name: Verificar se o código Java compila
         run: |
-          mkdir -p out
-          javac -d out src/*.java   # Compila o código Java
-          java -cp out TestClass    # Roda a classe de testes (substitua TestClass pela sua classe de testes)
-        continue-on-error: false  # Se a execução falhar, interrompe o workflow
-
-  deploy:
-    runs-on: ubuntu-latest  # Roda no Ubuntu
-
-    needs: test  # Só roda o deploy se o job "test" for bem-sucedido
-
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v2
-
-      # Passo 4: Adicionar a chave SSH (substitua conforme necessário)
-      - name: Adicionar chave SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519  # Chave privada no GitHub Secrets
-          chmod 600 ~/.ssh/id_ed25519
-          echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
-
-      # Passo 5: Fazer o deploy no servidor local via SSH
-      - name: Deploy no servidor local
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
+          # Compilar todos os arquivos Java em 'src'
+          javac src/*.java
+          
+          # Verificar se a compilação foi bem-sucedida
+          if [ $? -ne 0 ]; then
+            echo "❌ Erros de compilação encontrados. Não é permitido fazer push!"
+            exit 1
+          else
+            echo "✅ O código compila corretamente!"
+          fi
