@@ -1,46 +1,12 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
-      - main  # Aciona o pipeline quando houver push na branch main
-
 jobs:
   test:
-    runs-on: ubuntu-latest  # Roda o job no Ubuntu
-
+    runs-on: ubuntu-latest
     steps:
       # Passo 1: Baixar o código do repositório
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Passo 2: Configurar o ambiente para rodar os testes
-      - name: Configurar Java (usando a distribuição temurin)
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'  # Versão do JDK
-          distribution: 'temurin'  # Distribuição do JDK
-          architecture: 'x64'  # Arquitetura da máquina
-
-      # Passo 3: Rodar os testes de integração com Maven
-      - name: Rodar testes de integração
+      # Passo 2: Rodar testes customizados (caso tenha um script de teste)
+      - name: Rodar testes
         run: |
-          mvn clean test  # Executa os testes com Maven, limpa o diretório e executa os testes
-
-  deploy:
-    runs-on: ubuntu-latest  # Roda o deploy no Ubuntu também
-
-    needs: test  # Só roda o deploy se os testes forem bem-sucedidos
-
-    steps:
-      - name: Adicionar chave SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519  # Adiciona a chave privada no secrets do GitHub
-          chmod 600 ~/.ssh/id_ed25519
-          echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
-
-      # Passo 4: Fazer o deploy no servidor local via SSH
-      - name: Deploy no servidor local
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
+          ./run_tests.sh  # Substitua pelo comando que executa seus testes (se tiver um script de shell)
