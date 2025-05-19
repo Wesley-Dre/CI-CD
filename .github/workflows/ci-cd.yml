@@ -13,8 +13,8 @@ jobs:
       - name: Adicionar chave SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519  # Recupera a chave privada do secret
+          chmod 600 ~/.ssh/id_ed25519  # Garante que a chave tenha as permissões corretas
           # Adicionar o servidor ao known_hosts para evitar o prompt de confirmação da chave do servidor
           ssh-keyscan -H 192.168.1.51 >> ~/.ssh/known_hosts
 
