@@ -15,8 +15,9 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
+          # Adicionar o servidor ao known_hosts para evitar o prompt de confirmação da chave do servidor
+          ssh-keyscan -H 192.168.1.51 >> ~/.ssh/known_hosts
 
       - name: Deploy no servidor local
         run: |
-          ssh local-server "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
+          ssh -i ~/.ssh/id_ed25519 vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
