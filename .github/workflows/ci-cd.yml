@@ -13,12 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Passo 1: Baixar o código do repositório
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Passo 2: Listar arquivos para confirmar estrutura (ajuste se quiser)
+      - name: Listar arquivos do projeto
+        run: ls -R
+
+      # Passo 3: Compilar e rodar testes
       - name: Compilar código Java e rodar testes
         run: |
-          javac -d out src/*.java || { echo "::error::Falha na compilação!"; exit 1; }
+          mkdir -p out
+          # Ajuste o caminho src abaixo conforme sua estrutura
+          javac -d out $(find src -name "*.java") || { echo "::error::Falha na compilação!"; exit 1; }
           java -cp out TestClass || { echo "::error::Testes falharam!"; exit 1; }
           echo "✅ Testes passaram!"
 
