@@ -13,21 +13,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Passo 1: Baixar o código do repositório
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Passo 2: Listar arquivos para confirmar estrutura (ajuste se quiser)
       - name: Listar arquivos do projeto
         run: ls -R
 
-      # Passo 3: Compilar e rodar testes
+      - name: Instalar dependências do Maven (se necessário)
+        run: |
+          sudo apt-get update
+          sudo apt-get install maven
+
       - name: Compilar código Java e rodar testes
         run: |
           mkdir -p out
-          # Ajuste o caminho src abaixo conforme sua estrutura
+          # Compile todas as classes Java na pasta src
           javac -d out $(find src -name "*.java") || { echo "::error::Falha na compilação!"; exit 1; }
-          java -cp out TestClass || { echo "::error::Testes falharam!"; exit 1; }
+          
+          # Rodar os testes com JUnit (caso use Maven, pode ajustar o comando)
+          # Se você usa JUnit e não tem um sistema de build, você precisará incluir as dependências do JUnit manualmente:
+          java -cp out:$(find ~/.m2/repository -name "junit-*.jar" | tr '\n' ':') org.junit.runner.JUnitCore $(find src -name "*Test.java" -exec basename {} .java \;) || { echo "::error::Testes falharam!"; exit 1; }
+          
           echo "✅ Testes passaram!"
 
   deploy:
