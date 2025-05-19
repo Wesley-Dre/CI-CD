@@ -31,7 +31,7 @@ public class Ci {
         for (Inquilino i : listaInquilinos) {
             i.exibirDados();
         }
-
+        aa
         scanner.close();
     }
 }
