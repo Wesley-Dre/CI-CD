@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  test:
-    name: Verificar
+  verificar:
+    name: Verificar Compilação Java
     runs-on: ubuntu-latest
 
     steps:
