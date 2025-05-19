@@ -20,23 +20,32 @@ jobs:
       # Passo 2: Rodar os testes de integração ou verificação do código
       - name: Rodar testes
         run: |
-          # Rodar a verificação de sintaxe (compilar e executar, ou customizar para seu caso)
+          # Compilando o código Java (ajustar se necessário para o seu caso)
           javac -d out src/*.java   # Compila o código Java
-          java -cp out TestClass    # Roda os testes em TestClass (substitua pelo nome da sua classe de testes)
+          
+          # Verifique se o comando de compilação falhou
+          if [ $? -ne 0 ]; then
+            echo "❌ Falha na compilação! Não é permitido fazer push!"
+            exit 1  # Se falhar, sai com erro
+          fi
 
-      # Verificação se os testes falharam
+          # Rodando testes (ajustar conforme sua estrutura de testes)
+          java -cp out TestClass    # Substitua TestClass pela sua classe de teste, se necessário
+
+          # Verificando se os testes passaram
+          if [ $? -ne 0 ]; then
+            echo "❌ Testes falharam. Não é permitido fazer push!"
+            exit 1  # Se os testes falharem, sai com erro
+          fi
+
+      # Passo 3: Verificação se tudo passou, caso contrário não faz push
       - name: Verificar se os testes passaram
         run: |
-          if [ $? -ne 0 ]; then
-            echo "❌ Testes falharam. Não é permitido fazer push!" 
-            exit 1  # Não permite o push, falha no workflow
-          else
-            echo "✅ Testes passaram! Pode prosseguir com o commit."
-          fi
-          
+          echo "✅ Testes passaram! Pode prosseguir com o commit."
+
   # O deploy não será executado se o job de teste falhar
   deploy:
-    needs: test
+    needs: test  # O job de deploy só vai rodar se o de testes passar
     runs-on: ubuntu-latest  # Roda no Ubuntu também
 
     steps:
