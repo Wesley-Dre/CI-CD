@@ -1,20 +1,40 @@
-name: CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main  # Aciona o pipeline quando houver push na branch main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest  # Roda o job no Ubuntu
 
     steps:
-      # Passo 1: Instalar sshpass para usar senha no SSH
-      - name: Instalar sshpass
-        run: sudo apt-get install -y sshpass
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      # Passo 2: Realizar deploy usando senha via sshpass
+      - name: Configurar Java (caso seja Java, adapte para a sua linguagem)
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Rodar testes de integração
+        run: |
+          ./gradlew test  # Ou qualquer comando para rodar seus testes, como mvn test ou ./run_tests.sh
+
+  deploy:
+    runs-on: ubuntu-latest  # Roda o deploy no Ubuntu também
+
+    needs: test  # Só roda o deploy se os testes forem bem-sucedidos
+
+    steps:
+      - name: Adicionar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519  # Adiciona a chave privada do GitHub Secrets
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
+
       - name: Deploy no servidor local
         run: |
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
