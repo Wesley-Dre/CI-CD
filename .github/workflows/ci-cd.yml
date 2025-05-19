@@ -10,18 +10,23 @@ jobs:
     runs-on: ubuntu-latest  # Roda o job no Ubuntu
 
     steps:
+      # Passo 1: Baixar o código do repositório
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Configurar Java (caso seja Java, adapte para a sua linguagem)
+      # Passo 2: Configurar o ambiente para rodar os testes
+      - name: Configurar Java (usando a distribuição adotopenjdk)
         uses: actions/setup-java@v2
         with:
-          java-version: '11'
-
+          java-version: '11'             # Versão do JDK
+          distribution: 'adoptopenjdk'   # Distribuição do JDK
+          architecture: 'x64'            # Arquitetura da máquina
+          
+      # Passo 3: Rodar os testes de integração (exemplo para Java)
       - name: Rodar testes de integração
         run: |
           ./gradlew test  # Ou qualquer comando para rodar seus testes, como mvn test ou ./run_tests.sh
-
+          
   deploy:
     runs-on: ubuntu-latest  # Roda o deploy no Ubuntu também
 
@@ -31,10 +36,11 @@ jobs:
       - name: Adicionar chave SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519  # Adiciona a chave privada do GitHub Secrets
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519  # Adiciona a chave privada no secrets do GitHub
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host local-server\n  HostName 192.168.1.51\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
 
+      # Passo 4: Fazer o deploy no servidor local via SSH
       - name: Deploy no servidor local
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no vaio@192.168.1.51 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
+          sshpass -p "${{ secrets.SSH_PASSWORD_
