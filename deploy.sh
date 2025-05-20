@@ -1,19 +1,29 @@
-#!/bin/bash
+name: Deploy via SSH
 
-echo "🔁 Iniciando deploy local..."
+on:
+  push:
+    branches:
+      - main
 
-# Navegar até o diretório da aplicação
-cd /c/Users/vaio/CICD/CICD
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
 
-# Puxar as últimas alterações do repositório
-git pull origin main
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan your.server.com >> ~/.ssh/known_hosts
 
-# Opcional: Parar o serviço da aplicação
-# systemctl stop nome-do-serviço
-
-# Compilar e/ou iniciar a aplicação (dependendo do tipo de aplicação)
-# ./build.sh
-# ./start.sh
-# systemctl start nome-do-serviço
-
-echo "✅ Deploy concluído com sucesso."
+      - name: Executar script remoto
+        run: |
+          ssh -i ~/.ssh/id_rsa user@your.server.com 'bash -s' << 'EOF'
+          echo "🔁 Iniciando deploy no servidor remoto..."
+          cd /caminho/para/sua/aplicacao || exit 1
+          git pull origin main || exit 1
+          echo "✅ Deploy concluído com sucesso."
+          EOF
