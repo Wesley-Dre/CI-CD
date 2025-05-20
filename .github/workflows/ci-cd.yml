@@ -36,8 +36,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          echo -e "Host local-server\n  HostName 192.168.0.12\n  User vaio\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
+          echo -e "Host local-server\nHostName 192.168.0.12\nUser vaio\nIdentityFile ~/.ssh/id_ed25519\nStrictHostKeyChecking no" > ~/.ssh/config
 
       - name: Deploy no servidor via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no vaio@192.168.0.12 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
+          ssh vaio@local-server "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
