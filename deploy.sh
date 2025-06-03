@@ -23,7 +23,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa user@your.server.com 'bash -s' << 'EOF'
           echo "🔁 Iniciando deploy no servidor remoto..."
-          cd /caminho/para/sua/aplicacao || exit 1
+          cd c:\Users\VAIO\CICD\CICD || exit 1
           git pull origin main || exit 1
           echo "✅ Deploy concluído com sucesso."
           EOF
