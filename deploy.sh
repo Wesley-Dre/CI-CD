@@ -21,7 +21,7 @@ jobs:
 
       - name: Executar script remoto
         run: |
-          ssh -i ~/.ssh/id_rsa user@your.server.com 'bash -s' << 'EOF'
+          ssh -i ~/.ssh/id_rsa 192.168.1.36 'bash -s' << 'EOF'
           echo "🔁 Iniciando deploy no servidor remoto..."
           cd c:\Users\VAIO\CICD\CICD || exit 1
           git pull origin main || exit 1
