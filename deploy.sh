@@ -15,9 +15,9 @@ jobs:
       - name: Configurar chave SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEYS }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan your.server.com >> ~/.ssh/known_hosts
+          ssh-keyscan 192.168.1.36 >> ~/.ssh/known_hosts
 
       - name: Executar script remoto
         run: |
