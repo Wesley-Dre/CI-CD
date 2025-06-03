@@ -1,19 +1,43 @@
-name: CI/CD Local
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: self-hosted  # <- roda no seu PC
+  verificar_e_deploy:
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v3
+      - name: Checkout do código
+        uses: actions/checkout@v3
 
-    - name: Rodar Deploy Script
-      run: |
-        cd C:/Users/seu_usuario/CICD
-        ./deploy.sh
+      - name: Listar arquivos (debug)
+        run: ls -R
+
+      - name: Compilar código Java
+        run: |
+          mkdir -p out
+          echo "Compilando arquivos..."
+          if javac -d out $(find src -name "*.java"); then
+            echo "✅ Compilação bem-sucedida."
+          else
+            echo "::error::Erro na compilação!"
+            exit 1
+          fi
+
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host local-server\nHostName 10.114.65.197\nUser vaio\nIdentityFile ~/.ssh/id_ed25519\nStrictHostKeyChecking no" > ~/.ssh/config
+
+      - name: Deploy no servidor via SSH
+        run: |
+          ssh vaio@local-server "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
