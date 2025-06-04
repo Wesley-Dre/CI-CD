@@ -17,7 +17,7 @@ jobs:
 
       - name: Executar script remoto via senha
         env:
-          SSH_PASS: 459900
+          SSH_PASS: ${{ secrets.SSH_PASSWORD }}
         run: |
           sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no vaio@192.168.1.36 'powershell -Command "
             Write-Host 🔁 Iniciando deploy no servidor remoto...;
