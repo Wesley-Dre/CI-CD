@@ -12,18 +12,15 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Configurar chave SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEYS }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 192.168.1.36 >> ~/.ssh/known_hosts
+      - name: Instalar sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Executar script remoto
+      - name: Executar script remoto via senha
+        env:
+          SSH_PASS: 459900
         run: |
-          ssh -i ~/.ssh/id_rsa 192.168.1.36 'bash -s' << 'EOF'
-          echo "🔁 Iniciando deploy no servidor remoto..."
-          cd c:\Users\VAIO\CICD\CICD || exit 1
-          git pull origin main || exit 1
-          echo "✅ Deploy concluído com sucesso."
-          EOF
+          sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no vaio@192.168.1.36 'powershell -Command "
+            Write-Host 🔁 Iniciando deploy no servidor remoto...;
+            Set-Location C:\Users\VAIO\CICD\CICD;
+            git pull origin main;
+            Write-Host ✅ Deploy concluído com sucesso."'
