@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  verificar_e_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Listar arquivos (debug)
+        run: ls -R
+
+      - name: Compilar código Java
+        run: |
+          mkdir -p out
+          echo "Compilando arquivos..."
+          if javac -d out $(find src -name "*.java"); then
+            echo "✅ Compilação bem-sucedida."
+          else
+            echo "::error::Erro na compilação!"
+            exit 1
+          fi
+
+      - name: Instalar sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Deploy no servidor via SSH
+        env:
+          SSH_PASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no vaio@192.168.1.36 "cd /c/Users/vaio/CICD/CICD && ./deploy.sh"
